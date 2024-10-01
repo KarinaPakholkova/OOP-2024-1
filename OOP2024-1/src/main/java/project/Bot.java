@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
+
 public class Bot extends TelegramLongPollingBot {
 
     public String getBotUsername() {
@@ -20,21 +21,30 @@ public class Bot extends TelegramLongPollingBot {
         try{
             if(update.hasMessage() && update.getMessage().hasText())
             {
+                ListOfCommands commandsList = new ListOfCommands();
+                Message inMessage = update.getMessage();
+                String chatId = inMessage.getChatId().toString();
+                String message = commandsList.findCommand(inMessage.getText());
+                SendMessage outMessage = new SendMessage();
+                outMessage.setChatId(chatId);
+                outMessage.setText(message);
 
-                Message inMess = update.getMessage();
-                String chatId = inMess.getChatId().toString();
-                String answer = parseMessage(inMess.getText());
-                SendMessage outMess = new SendMessage();
-                outMess.setChatId(chatId);
-                outMess.setText(answer);
-
-                execute(outMess);
+                execute(outMessage);
             }
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
-    public String parseMessage(String textMsg) {
+
+
+
+
+
+
+
+
+
+/*    public String parseMessage(String textMsg) {
         String answer;
 
         if (textMsg.equals("/start"))
@@ -53,6 +63,6 @@ public class Bot extends TelegramLongPollingBot {
             answer = "Команда не распознана";
 
         return answer;
-    }
+    }*/
 }
 
