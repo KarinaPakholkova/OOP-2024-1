@@ -4,7 +4,7 @@ import org.junit.jupiter.api.Test;
 import project.ListOfCommands;
 import static org.junit.jupiter.api.Assertions.*;
 
-class HelpCommandTest {
+class CommandTest {
     @Test
     public void testStartCommand() {
         ListOfCommands commandsList = new ListOfCommands();
