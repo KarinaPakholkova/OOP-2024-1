@@ -1,4 +1,4 @@
-package commands;
+package project.commands;
 
 public class InfoCommand extends AbstractCommand{
 

@@ -1,6 +1,6 @@
 package project;
 
-import commands.*;
+import project.commands.*;
 import java.util.HashMap;
 import java.util.Set;
 

@@ -10,7 +10,7 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 public class Bot extends TelegramLongPollingBot {
 
     public String getBotUsername() {
-        return "CyberNews";
+        return "CyberNews_bot";
     }
 
     public String getBotToken() {
