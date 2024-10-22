@@ -18,51 +18,31 @@ public class Bot extends TelegramLongPollingBot {
     }
 
     public void onUpdateReceived(Update update) {
-        try{
-            if(update.hasMessage() && update.getMessage().hasText())
-            {
-                ListOfCommands commandsList = new ListOfCommands();
+        try {
+            if (update.hasMessage() && update.getMessage().hasText()) {
                 Message inMessage = update.getMessage();
                 String chatId = inMessage.getChatId().toString();
-                String message = commandsList.findCommand(inMessage.getText());
-                SendMessage outMessage = new SendMessage();
-                outMessage.setChatId(chatId);
-                outMessage.setText(message);
+                String userMessage = inMessage.getText();
 
-                execute(outMessage);
+                if (userMessage.equalsIgnoreCase("/latestnews")) {
+                    Api api = new Api();
+                    String news = api.fetchLatestNews(); // Получаем последние новости
+                    sendMessage(chatId, news);
+                } else {
+
+                    ListOfCommands commandsList = new ListOfCommands();
+                    String message = commandsList.findCommand(userMessage);
+                    sendMessage(chatId, message);
+                }
             }
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
-
-
-
-
-
-
-
-
-
-/*    public String parseMessage(String textMsg) {
-        String answer;
-
-        if (textMsg.equals("/start"))
-            answer = "Приветствую, это бот агрегатор новостей. Напиши /info, чтобы получить больше информации";
-        else if (textMsg.equals("/info"))
-            answer = "Бот-агрегатор новостей — ваш персональный помощник, который собирает самые важные и актуальные события из разных источников." +
-                    "Он фильтрует информацию по вашим интересам, предлагая свежие статьи, видео и аналитические материалы. Оставайтесь в курсе новостей легко и удобно!";
-        else if (textMsg.equals("/help"))
-            answer = "/start - перезапустить бота\n" +
-                    "/help - вывести список всех команд\n" +
-                    "/info - информация о боте\n" +
-                    "/authors - авторы бота";
-        else if (textMsg.equals("/authors"))
-            answer = "Авторами проекта являются студенты 2-го курса специалитета \"Компьютерная безопасность\" Пахолкова Карина и Марченко Артем";
-        else
-            answer = "Команда не распознана";
-
-        return answer;
-    }*/
+    private void sendMessage(String chatId, String messageText) throws TelegramApiException {
+        SendMessage outMessage = new SendMessage();
+        outMessage.setChatId(chatId);
+        outMessage.setText(messageText);
+        execute(outMessage);
+    }
 }
-
