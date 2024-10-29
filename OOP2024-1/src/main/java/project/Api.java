@@ -2,18 +2,14 @@ package project;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpClient;
-import org.apache.hc.client5.http.impl.classic.CloseableHttpResponse;
-import org.apache.hc.client5.http.impl.classic.HttpClients;
-import org.apache.hc.core5.http.ParseException;
-import org.apache.hc.core5.http.io.entity.EntityUtils;
-import org.telegram.telegrambots.bots.TelegramLongPollingBot;
-import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.sql.Array;
 
 public class Api {
 
@@ -24,27 +20,28 @@ public class Api {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(apiUrl);
             try (CloseableHttpResponse response = httpClient.execute(request)) {
-                if (response.getCode() == 200) {
+                if (response.getStatusLine().getStatusCode() == 200) {
                     String jsonResponse = EntityUtils.toString(response.getEntity());
                     return parseNewsResponse(jsonResponse);
                 } else {
-                    return "Не удалось получить новости. Статус: " + response.getCode();
+                    return "Не удалось получить новости. Статус: " + response.getStatusLine().getStatusCode();
                 }
             }
-        } catch (IOException | ParseException e) {
+        } catch (IOException e) {
             e.printStackTrace();
             return "Ошибка при получении новостей.";
         }
-    }// Метод для парсинга JSON-ответа и формирования строки с заголовками новостей
+    }
 
-    private String parseNewsResponse(String jsonResponse) {
+    // Метод для парсинга JSON-ответа и формирования строки с заголовками новостей
+    String parseNewsResponse(String jsonResponse) {
         StringBuilder newsBuilder = new StringBuilder();
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(jsonResponse);
             JsonNode articlesNode = rootNode.path("articles");
 
-            if (articlesNode.isArray()) {
+            if (articlesNode.isArray() && !(articlesNode.isEmpty())) {
                 for (int i = 0; i < Math.min(5, articlesNode.size()); i++) {
                     JsonNode article = articlesNode.get(i);
                     String title = article.path("title").asText();

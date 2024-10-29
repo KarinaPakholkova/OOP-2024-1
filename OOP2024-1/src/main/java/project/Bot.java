@@ -39,6 +39,7 @@ public class Bot extends TelegramLongPollingBot {
             e.printStackTrace();
         }
     }
+
     private void sendMessage(String chatId, String messageText) throws TelegramApiException {
         SendMessage outMessage = new SendMessage();
         outMessage.setChatId(chatId);
@@ -46,3 +47,4 @@ public class Bot extends TelegramLongPollingBot {
         execute(outMessage);
     }
 }
+
