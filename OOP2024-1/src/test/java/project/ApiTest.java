@@ -32,11 +32,11 @@ public class ApiTest {
     @Test
     public void testFetchLatestNews_Success() throws Exception {
         String json = "{ \"articles\": [ " +
-                "{ \"title\": \"[Removed]\", \"url\": \"https://removed.com\" }, " +
-                "{ \"title\": \"[Removed]\", \"url\": \"https://removed.com\" } " +
-                "{ \"title\": \"Apple Music helps artists turn concert set lists into playlists\", \"url\": \"https://consent.yahoo.com/v2/collectConsent?sessionId=1_cc-session_7ea2282d-108d-445c-b4b9-8c1fd169551d\" } " +
-                "{ \"title\": \"The Apple Pencil Pro is 30 percent off, taking it down to an all-time low price\", \"url\": \"https://consent.yahoo.com/v2/collectConsent?sessionId=1_cc-session_2711bbdf-0325-4496-a71b-8ef9816078e3\" } " +
-                "{ \"title\": \"iOS 18.1 launches next week with Apple Intelligence and AirPods Pro hearing tests and aids\", \"url\": \"https://consent.yahoo.com/v2/collectConsent?sessionId=1_cc-session_53f156c9-a116-4dee-b151-0e8462185bfe\" } " +
+                "{ \"title\": \"Washington Post owner defends decision to end presidential endorsements - Al Jazeera English\", \"url\": \"https://www.aljazeera.com/news/2024/10/29/washington-post-owner-defends-decision-to-end-presidential-endorsements\" }, " +
+                "{ \"title\": \"World Series 2024: Freddie Freeman, Walker Buehler lead Dodgers past Yankees for commanding 3-0 lead - Yahoo Sports\", \"url\": \"https://sports.yahoo.com/live/world-series-2024-freddie-freeman-walker-buehler-lead-dodgers-past-yankees-for-commanding-3-0-lead-230010724.html\" } " +
+                "{ \"title\": \"Monday Night Football: Steelers get a team win, beat Giants 26-18 - NBC Sports\", \"url\": \"https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/monday-night-football-steelers-get-a-team-win-beat-giants-26-18\" } " +
+                "{ \"title\": \"Israel has banned the UN agency for Palestinian refugees. That could be devastating for millions - CNN\", \"url\": \"https://www.cnn.com/2024/10/28/middleeast/unrwa-israel-knesset-vote-ban-palestinians-intl/index.html\" } " +
+                "{ \"title\": \"Confederate anthem ‘Dixie’ played at Trump’s Madison Square Garden rally - The Washington Post\", \"url\": \"https://www.washingtonpost.com/nation/2024/10/28/trump-madison-square-garden-rally-dixie-song-controversy/\" } " +
                 "] }";
         StringEntity entity = new StringEntity(json);
 
@@ -46,16 +46,16 @@ public class ApiTest {
 
         String result = api.fetchLatestNews();
 
-        assertTrue(result.contains("1. [Removed]"));
-        assertTrue(result.contains("Подробнее: https://removed.com"));
-        assertTrue(result.contains("2. [Removed]"));
-        assertTrue(result.contains("Подробнее: https://removed.com"));
-        assertTrue(result.contains("3. Apple Music helps artists turn concert set lists into playlists"));
-        assertTrue(result.contains("Подробнее: https://consent.yahoo.com/v2/collectConsent?sessionId=1_cc-session_7ea2282d-108d-445c-b4b9-8c1fd169551d"));
-        assertTrue(result.contains("4. The Apple Pencil Pro is 30 percent off, taking it down to an all-time low price"));
-        assertTrue(result.contains("Подробнее: https://consent.yahoo.com/v2/collectConsent?sessionId=1_cc-session_2711bbdf-0325-4496-a71b-8ef9816078e3"));
-        assertTrue(result.contains("5. iOS 18.1 launches next week with Apple Intelligence and AirPods Pro hearing tests and aids"));
-        assertTrue(result.contains("Подробнее: https://consent.yahoo.com/v2/collectConsent?sessionId=1_cc-session_53f156c9-a116-4dee-b151-0e8462185bfe"));
+        assertTrue(result.contains("1. Washington Post owner defends decision to end presidential endorsements - Al Jazeera English"));
+        assertTrue(result.contains("Подробнее: https://www.aljazeera.com/news/2024/10/29/washington-post-owner-defends-decision-to-end-presidential-endorsements"));
+        assertTrue(result.contains("2. World Series 2024: Freddie Freeman, Walker Buehler lead Dodgers past Yankees for commanding 3-0 lead - Yahoo Sports"));
+        assertTrue(result.contains("Подробнее: https://sports.yahoo.com/live/world-series-2024-freddie-freeman-walker-buehler-lead-dodgers-past-yankees-for-commanding-3-0-lead-230010724.html"));
+        assertTrue(result.contains("3. Monday Night Football: Steelers get a team win, beat Giants 26-18 - NBC Sports"));
+        assertTrue(result.contains("Подробнее: https://www.nbcsports.com/nfl/profootballtalk/rumor-mill/news/monday-night-football-steelers-get-a-team-win-beat-giants-26-18"));
+        assertTrue(result.contains("4. Israel has banned the UN agency for Palestinian refugees. That could be devastating for millions - CNN"));
+        assertTrue(result.contains("Подробнее: https://www.cnn.com/2024/10/28/middleeast/unrwa-israel-knesset-vote-ban-palestinians-intl/index.html"));
+        assertTrue(result.contains("5. Confederate anthem ‘Dixie’ played at Trump’s Madison Square Garden rally - The Washington Post"));
+        assertTrue(result.contains("Подробнее: https://www.washingtonpost.com/nation/2024/10/28/trump-madison-square-garden-rally-dixie-song-controversy/"));
     }
 
     @Test

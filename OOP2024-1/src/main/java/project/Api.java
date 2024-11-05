@@ -15,7 +15,7 @@ public class Api {
 
     public String fetchLatestNews() {
         String apiKey = System.getenv("NEWS_API_KEY");
-        String apiUrl = "https://newsapi.org/v2/everything?q=Apple&from=2024-10-13&sortBy=popularity&apiKey=" + apiKey;
+        String apiUrl = "https://newsapi.org/v2/top-headlines?country=us&apiKey=" + apiKey;
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(apiUrl);
@@ -40,14 +40,18 @@ public class Api {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(jsonResponse);
             JsonNode articlesNode = rootNode.path("articles");
-
+            int k = 0;
             if (articlesNode.isArray() && !(articlesNode.isEmpty())) {
-                for (int i = 0; i < Math.min(5, articlesNode.size()); i++) {
+                for (int i = 0; i < articlesNode.size() && k != 5; i++) {
                     JsonNode article = articlesNode.get(i);
                     String title = article.path("title").asText();
                     String url = article.path("url").asText();
+                    if (url.equals("https://removed.com")) {
+                        continue;
+                    }
                     newsBuilder.append(i + 1).append(". ").append(title).append("\n");
                     newsBuilder.append("Подробнее: ").append(url).append("\n\n");
+                    k++;
                 }
             } else {
                 newsBuilder.append("Не удалось получить новости.");
