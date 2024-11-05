@@ -21,6 +21,6 @@ public class ListOfCommands {
         }
         Set obEntrySet = commandHashMap.entrySet();
         System.out.println(obEntrySet);
-        return text;
+        return text;    
     }
 }
