@@ -9,33 +9,38 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.sql.Array;
+import java.util.ArrayList;
+import java.util.List;
+
+import java.util.AbstractMap.SimpleEntry; // Импортируем SimpleEntry
 
 public class Api {
-
-    public String fetchLatestNews() {
+    // Измените метод fetchLatestNews, чтобы он возвращал список пар (заголовок, URL)
+    public List<SimpleEntry<String, String>> fetchLatestNews() {
         String apiKey = System.getenv("NEWS_API_KEY");
         String apiUrl = "https://newsapi.org/v2/top-headlines?country=us&apiKey=" + apiKey;
+        List<SimpleEntry<String, String>> newsList = new ArrayList<>();
 
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpGet request = new HttpGet(apiUrl);
             try (CloseableHttpResponse response = httpClient.execute(request)) {
                 if (response.getStatusLine().getStatusCode() == 200) {
                     String jsonResponse = EntityUtils.toString(response.getEntity());
-                    return parseNewsResponse(jsonResponse);
+                    newsList = parseNewsResponse(jsonResponse);
                 } else {
-                    return "Не удалось получить новости. Статус: " + response.getStatusLine().getStatusCode();
+                    newsList.add(new SimpleEntry<>("Не удалось получить новости. Статус: " + response.getStatusLine().getStatusCode(), ""));
                 }
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return "Ошибка при получении новостей.";
+            newsList.add(new SimpleEntry<>("Ошибка при получении новостей.", ""));
         }
+        return newsList;
     }
 
-    // Метод для парсинга JSON-ответа и формирования строки с заголовками новостей
-    String parseNewsResponse(String jsonResponse) {
-        StringBuilder newsBuilder = new StringBuilder();
+    // Измените метод parseNewsResponse, чтобы он возвращал список пар (заголовок, URL)
+    List<SimpleEntry<String, String>> parseNewsResponse(String jsonResponse) {
+        List<SimpleEntry<String, String>> newsList = new ArrayList<>();
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             JsonNode rootNode = objectMapper.readTree(jsonResponse);
@@ -49,17 +54,16 @@ public class Api {
                     if (url.equals("https://removed.com")) {
                         continue;
                     }
-                    newsBuilder.append(i + 1).append(". ").append(title).append("\n");
-                    newsBuilder.append("Подробнее: ").append(url).append("\n\n");
+                    newsList.add(new SimpleEntry<>(title, url));
                     k++;
                 }
             } else {
-                newsBuilder.append("Не удалось получить новости.");
+                newsList.add(new SimpleEntry<>("Не удалось получить новости.", ""));
             }
         } catch (IOException e) {
             e.printStackTrace();
-            return "Ошибка при обработке новостей.";
+            newsList.add(new SimpleEntry<>("Ошибка при обработке новостей.", ""));
         }
-        return newsBuilder.toString();
+        return newsList;
     }
 }

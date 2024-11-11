@@ -4,10 +4,7 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMar
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardButton;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.KeyboardRow;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Keyboard {
     private static final Map<String, String> buttonTextToCommandMap = new HashMap<>();
@@ -20,7 +17,7 @@ public class Keyboard {
         buttonTextToCommandMap.put("like №5", "like №5");
     }
 
-    public static ReplyKeyboardMarkup getNewsKeyboard(List<String> newsList) {
+    public static ReplyKeyboardMarkup getNewsKeyboard(List<AbstractMap.SimpleEntry<String, String>> newsList) {
         ReplyKeyboardMarkup keyboardMarkup = new ReplyKeyboardMarkup();
         keyboardMarkup.setResizeKeyboard(true);
         keyboardMarkup.setOneTimeKeyboard(true);
