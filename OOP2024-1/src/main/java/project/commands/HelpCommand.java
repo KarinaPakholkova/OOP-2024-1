@@ -22,6 +22,7 @@ public class HelpCommand extends AbstractCommand {
             String description = entry.getValue().getDescription();
             msg.append(commandText).append(" - ").append(description).append("\n");
         }
+        msg.append("/latestnews - Показывает последние пять новостей\n");
         return msg.toString();
     }
 }

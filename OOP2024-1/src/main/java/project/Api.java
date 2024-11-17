@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.AbstractMap.SimpleEntry; // Импортируем SimpleEntry
 
 public class Api {
-    // Измените метод fetchLatestNews, чтобы он возвращал список пар (заголовок, URL)
+
     public List<SimpleEntry<String, String>> fetchLatestNews() {
         String apiKey = System.getenv("NEWS_API_KEY");
         String apiUrl = "https://newsapi.org/v2/top-headlines?country=us&apiKey=" + apiKey;
@@ -38,7 +38,6 @@ public class Api {
         return newsList;
     }
 
-    // Измените метод parseNewsResponse, чтобы он возвращал список пар (заголовок, URL)
     List<SimpleEntry<String, String>> parseNewsResponse(String jsonResponse) {
         List<SimpleEntry<String, String>> newsList = new ArrayList<>();
         try {
@@ -57,7 +56,8 @@ public class Api {
                     newsList.add(new SimpleEntry<>(title, url));
                     k++;
                 }
-            } else {
+            }
+            else {
                 newsList.add(new SimpleEntry<>("Не удалось получить новости.", ""));
             }
         } catch (IOException e) {

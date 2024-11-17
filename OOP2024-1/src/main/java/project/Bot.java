@@ -6,6 +6,7 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
+import project.database.DatabaseManager;
 
 import java.util.HashMap;
 import java.util.List;
@@ -26,6 +27,7 @@ public class Bot extends TelegramLongPollingBot {
     private void sendMessage(SendMessage message) throws TelegramApiException {
         execute(message);
     }
+    String[] headlines = new String[5];
     public void onUpdateReceived(Update update) {
         try {
             if (update.hasMessage() && update.getMessage().hasText()) {
@@ -33,17 +35,18 @@ public class Bot extends TelegramLongPollingBot {
                 String chatId = inMessage.getChatId().toString();
                 String userMessage = inMessage.getText();
 
+
                 if (userMessage.equalsIgnoreCase("/latestnews")) {
                     Api api = new Api();
                     List<SimpleEntry<String, String>> newsList = api.fetchLatestNews(); // Получаем последние новости
-
 
                     // Отправляем текст новостей
                     StringBuilder newsText = new StringBuilder("Вот последние новости:\n");
                     for (int i = 0; i < newsList.size(); i++) {
                         SimpleEntry<String, String> news = newsList.get(i);
                         newsText.append(i + 1).append(". ").append(news.getKey()).append("\n").append(news.getValue()).append("\n");
-                        buttonTextToUrlMap.put("like №" + (i + 1), news.getValue()); // Сохраняем соответствие
+                        buttonTextToUrlMap.put(String.valueOf(i + 1), news.getValue()); // Сохраняем соответствие
+                        headlines[i] = news.getKey();
                     }
                     // Создаем и отправляем сообщение с новостями
                     SendMessage newsMessage = new SendMessage();
@@ -61,8 +64,12 @@ public class Bot extends TelegramLongPollingBot {
 
                 } else if (buttonTextToUrlMap.containsKey(userMessage)) {
                     // Обработка нажатия на кнопку с новостью
+                    DatabaseManager insert = new DatabaseManager();
+                    Long userId = update.getMessage().getFrom().getId();
                     String likedNewsUrl = buttonTextToUrlMap.get(userMessage);
-                    sendMessage(chatId, "Вы выбрали: " + userMessage + "\nСсылка: " + likedNewsUrl);
+                    insert.insertLikedNew(userId, headlines[Integer.parseInt(String.valueOf(userMessage)) - 1], likedNewsUrl);
+                    sendMessage(chatId, "Вы выбрали новость " + userMessage + "\nСсылка: " + likedNewsUrl);
+
                 } else {
                     ListOfCommands commandsList = new ListOfCommands();
                     String message = commandsList.findCommand(userMessage);

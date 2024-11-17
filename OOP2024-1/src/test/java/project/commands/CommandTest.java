@@ -16,7 +16,7 @@ class CommandTest {
     public void testUnknownCommand() {
         ListOfCommands commandsList = new ListOfCommands();
         String message = commandsList.findCommand("/command");
-        assertEquals(message, "/command");
+        assertEquals(message, "Неверная команда");
     }
 
     @Test
