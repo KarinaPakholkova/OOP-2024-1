@@ -14,7 +14,6 @@ class KeyboardTest {
 
     @Test
     void testGetNewsKeyboard_EmptyList() {
-
         List<AbstractMap.SimpleEntry<String, String>> newsList = new ArrayList<>();
 
         ReplyKeyboardMarkup keyboard = Keyboard.getNewsKeyboard(newsList);
@@ -25,7 +24,6 @@ class KeyboardTest {
 
     @Test
     void testGetNewsKeyboard_SingleEntry() {
-
         List<AbstractMap.SimpleEntry<String, String>> newsList = new ArrayList<>();
         newsList.add(new AbstractMap.SimpleEntry<>("Title 1", "Content 1"));
 
