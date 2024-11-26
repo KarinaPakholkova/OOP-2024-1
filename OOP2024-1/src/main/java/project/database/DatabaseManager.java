@@ -6,15 +6,14 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 
 public class DatabaseManager {
-    private Connection connection;
+    Connection connection;
 
     // Метод для подключения к базе данных
     public void connect() {
         try {
-            // Замените URL, USER и PASSWORD на ваши данные
             String url = "jdbc:postgresql://localhost:5432/dbfortgbot";
-            String user = "postgres";
-            String password = "qwerkiller";
+            String user = System.getenv("DATABASE_USER");
+            String password = System.getenv("DATABASE_PASSWORD");
             connection = DriverManager.getConnection(url, user, password);
             if (connection != null) {
                 System.out.println("Connected to the database.");
@@ -40,6 +39,7 @@ public class DatabaseManager {
         }
         disconnect();
     }
+
     // Метод удаления записи
     public void deleteLikedNew(Long userId, String url) {
         connect();
