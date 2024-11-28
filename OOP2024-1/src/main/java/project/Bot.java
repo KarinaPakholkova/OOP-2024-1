@@ -62,14 +62,6 @@ public class Bot extends TelegramLongPollingBot {
                     keyboardMessage.setReplyMarkup(keyboard);
                     sendMessage(keyboardMessage);
 
-                } else if (buttonTextToUrlMap.containsKey(userMessage)) {
-                    // Обработка нажатия на кнопку с новостью
-                    DatabaseManager insert = new DatabaseManager();
-                    Long userId = update.getMessage().getFrom().getId();
-                    String likedNewsUrl = buttonTextToUrlMap.get(userMessage);
-                    insert.insertLikedNew(userId, headlines[Integer.parseInt(String.valueOf(userMessage)) - 1], likedNewsUrl);
-                    sendMessage(chatId, "Вы выбрали новость " + userMessage + "\nСсылка: " + likedNewsUrl);
-
                 } else if (userMessage.equalsIgnoreCase("/mylikednews")) {
                     DatabaseManager dbManager = new DatabaseManager();
                     Long userId = update.getMessage().getFrom().getId();
@@ -90,8 +82,15 @@ public class Bot extends TelegramLongPollingBot {
                     likedNewsMessage.setText(likedNewsText.toString());
                     sendMessage(likedNewsMessage);
                 }
+                else if (buttonTextToUrlMap.containsKey(userMessage)) {
+                    // Обработка нажатия на кнопку с новостью
+                    DatabaseManager insert = new DatabaseManager();
+                    Long userId = update.getMessage().getFrom().getId();
+                    String likedNewsUrl = buttonTextToUrlMap.get(userMessage);
+                    insert.insertLikedNew(userId, headlines[Integer.parseInt(String.valueOf(userMessage)) - 1], likedNewsUrl);
+                    sendMessage(chatId, "Вы выбрали новость " + userMessage + "\nСсылка: " + likedNewsUrl);
 
-                else {
+                } else {
                     ListOfCommands commandsList = new ListOfCommands();
                     String message = commandsList.findCommand(userMessage);
                     sendMessage(chatId, message);
