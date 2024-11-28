@@ -23,6 +23,7 @@ public class HelpCommand extends AbstractCommand {
             msg.append(commandText).append(" - ").append(description).append("\n");
         }
         msg.append("/latestnews - Показывает последние пять новостей\n");
+        msg.append("/mylikednews - Показывает список сохраненных новостей\n");
         return msg.toString();
     }
 }

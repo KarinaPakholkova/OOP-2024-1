@@ -1,9 +1,9 @@
 package project.database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.AbstractMap;
+import java.util.ArrayList;
+import java.util.List;
 
 public class DatabaseManager {
     Connection connection;
@@ -56,8 +56,29 @@ public class DatabaseManager {
         disconnect();
     }
 
-    // Метод для закрытия соединения с базой данных
-    public void disconnect() {
+    // метод для вывода сохраненных новостей
+    public List<AbstractMap.SimpleEntry<String, String>> selectNews(Long userId) {
+        connect();
+        List<AbstractMap.SimpleEntry<String, String>> likedNews = new ArrayList<>();
+        String sql = "SELECT headline, url FROM users WHERE userID = ?";
+
+        try (PreparedStatement prSt = connection.prepareStatement(sql)) {
+            prSt.setLong(1, userId);
+            ResultSet resultSet = prSt.executeQuery();
+            while (resultSet.next()) {
+                String headline = resultSet.getString("headline");
+                String url = resultSet.getString("url");
+                likedNews.add(new AbstractMap.SimpleEntry<>(headline, url));
+            }
+        } catch (SQLException e) {
+            System.err.println("Ошибка при получении сохраненных новостей: " + e.getMessage());
+        }
+        disconnect();
+        return likedNews;
+    }
+
+        // Метод для закрытия соединения с базой данных
+    public void disconnect () {
         if (connection != null) {
             try {
                 connection.close();
@@ -68,3 +89,4 @@ public class DatabaseManager {
         }
     }
 }
+
