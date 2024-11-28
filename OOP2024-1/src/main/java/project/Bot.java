@@ -70,7 +70,28 @@ public class Bot extends TelegramLongPollingBot {
                     insert.insertLikedNew(userId, headlines[Integer.parseInt(String.valueOf(userMessage)) - 1], likedNewsUrl);
                     sendMessage(chatId, "Вы выбрали новость " + userMessage + "\nСсылка: " + likedNewsUrl);
 
-                } else {
+                } else if (userMessage.equalsIgnoreCase("/mylikednews")) {
+                    DatabaseManager dbManager = new DatabaseManager();
+                    Long userId = update.getMessage().getFrom().getId();
+                    List<SimpleEntry<String, String>> likedNewsList = dbManager.selectNews(userId);
+                    // Отправляем текст сохраненных новостей
+                    StringBuilder likedNewsText = new StringBuilder("Вот ваши сохраненные новости:\n");
+                    if (likedNewsList.isEmpty()) {
+                        likedNewsText.append("У вас нет сохраненных новостей.");
+                    } else {
+                        for (int i = 0; i < likedNewsList.size(); i++) {
+                            SimpleEntry<String, String> news = likedNewsList.get(i);
+                            likedNewsText.append(i + 1).append(". ").append(news.getKey()).append("\n").append(news.getValue()).append("\n");
+                        }
+                    }
+                    // Создаем и отправляем сообщение с сохраненными новостями
+                    SendMessage likedNewsMessage = new SendMessage();
+                    likedNewsMessage.setChatId(chatId);
+                    likedNewsMessage.setText(likedNewsText.toString());
+                    sendMessage(likedNewsMessage);
+                }
+
+                else {
                     ListOfCommands commandsList = new ListOfCommands();
                     String message = commandsList.findCommand(userMessage);
                     sendMessage(chatId, message);
@@ -89,4 +110,3 @@ public class Bot extends TelegramLongPollingBot {
     }
 
 }
-    
