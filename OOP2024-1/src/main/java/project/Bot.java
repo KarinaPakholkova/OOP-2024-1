@@ -7,14 +7,20 @@ import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import project.database.DatabaseManager;
+import project.API.Api;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.AbstractMap.SimpleEntry;
+import java.util.AbstractMap;
+
+import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 public class Bot extends TelegramLongPollingBot {
     private static final Map<String, String> buttonTextToUrlMap = new HashMap<>();
+    Boolean myLikedNewsCalled;
+    Boolean deleteNews = false;
 
 
     public String getBotUsername() {
@@ -34,10 +40,11 @@ public class Bot extends TelegramLongPollingBot {
                 Message inMessage = update.getMessage();
                 String chatId = inMessage.getChatId().toString();
                 String userMessage = inMessage.getText();
-
+                Long userId = update.getMessage().getFrom().getId();
 
                 if (userMessage.equalsIgnoreCase("/latestnews")) {
                     Api api = new Api();
+                    myLikedNewsCalled = true;
                     List<SimpleEntry<String, String>> newsList = api.fetchLatestNews(); // Получаем последние новости
 
                     // Отправляем текст новостей
@@ -62,9 +69,47 @@ public class Bot extends TelegramLongPollingBot {
                     keyboardMessage.setReplyMarkup(keyboard);
                     sendMessage(keyboardMessage);
 
-                } else if (userMessage.equalsIgnoreCase("/mylikednews")) {
+                } else if (userMessage.startsWith("/category ")) {
+                    String category = userMessage.substring(9).trim(); // Извлекаем категорию
+                    Api apiCategories = new Api();
+                    List<AbstractMap.SimpleEntry<String, String>> categoryNewsList = apiCategories.fetchNewsCategory(category); // Получаем новости по категории
+
+                    StringBuilder categoryNewsText = new StringBuilder("Вот новости для категории '" + category + "':\n");
+                    if (categoryNewsList.isEmpty()) {
+                        categoryNewsText.append("Нет новостей для этой категории.");
+                    } else {
+                        for (int i = 0; i < categoryNewsList.size(); i++) {
+                            AbstractMap.SimpleEntry<String, String> news = categoryNewsList.get(i);
+                            categoryNewsText.append(i + 1).append(". ").append(news.getKey()).append("\n").append(news.getValue()).append("\n");
+                        }
+                    }
+
+                    SendMessage categoryNewsMessage = new SendMessage();
+                    categoryNewsMessage.setChatId(chatId);
+                    categoryNewsMessage.setText(categoryNewsText.toString());
+                    sendMessage(categoryNewsMessage);
+
+                }
+                else if (userMessage.equalsIgnoreCase("/deletenews")) {
+                    sendMessage(chatId, "Введите номер новости, которую хотите удалить");
+                    deleteNews = true;
+                } else if (isNumeric(userMessage) && deleteNews) {
+                    int newsIndex = Integer.parseInt(userMessage) - 1;
                     DatabaseManager dbManager = new DatabaseManager();
-                    Long userId = update.getMessage().getFrom().getId();
+                    List<SimpleEntry<String, String>> likedNewsList = dbManager.selectNews(userId);
+                    if (newsIndex >= 0 && newsIndex < likedNewsList.size() && likedNewsList.get(newsIndex) != null) {
+                        String newsTitle = String.valueOf(likedNewsList.get(newsIndex));
+                        String newsUrl = likedNewsList.get(newsIndex).getValue();
+                        System.out.println(newsUrl);
+                        dbManager.deleteLikedNew(userId, newsUrl);
+                        sendMessage(chatId, "Новость \"" + newsTitle + "\" была удалена.");
+                    } else {
+                        sendMessage(chatId, "Неверный номер. Пожалуйста, введите номер от 1 до " + likedNewsList.size() + ".");
+                    }
+                    deleteNews = false;
+                }
+                else if (userMessage.equalsIgnoreCase("/mylikednews")) {
+                    DatabaseManager dbManager = new DatabaseManager();
                     List<SimpleEntry<String, String>> likedNewsList = dbManager.selectNews(userId);
                     // Отправляем текст сохраненных новостей
                     StringBuilder likedNewsText = new StringBuilder("Вот ваши сохраненные новости:\n");
@@ -85,7 +130,6 @@ public class Bot extends TelegramLongPollingBot {
                 else if (buttonTextToUrlMap.containsKey(userMessage)) {
                     // Обработка нажатия на кнопку с новостью
                     DatabaseManager insert = new DatabaseManager();
-                    Long userId = update.getMessage().getFrom().getId();
                     String likedNewsUrl = buttonTextToUrlMap.get(userMessage);
                     insert.insertLikedNew(userId, headlines[Integer.parseInt(String.valueOf(userMessage)) - 1], likedNewsUrl);
                     sendMessage(chatId, "Вы выбрали новость " + userMessage + "\nСсылка: " + likedNewsUrl);
