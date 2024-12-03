@@ -1,4 +1,4 @@
-package project;
+package project.API;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,13 +9,13 @@ import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.List;
 
-import java.util.AbstractMap.SimpleEntry; // Импортируем SimpleEntry
+import java.util.AbstractMap.SimpleEntry;
 
 public class Api {
-
     public List<SimpleEntry<String, String>> fetchLatestNews() {
         String apiKey = System.getenv("NEWS_API_KEY");
         String apiUrl = "https://newsapi.org/v2/top-headlines?country=us&apiKey=" + apiKey;
@@ -38,7 +38,29 @@ public class Api {
         return newsList;
     }
 
-    List<SimpleEntry<String, String>> parseNewsResponse(String jsonResponse) {
+    public List<AbstractMap.SimpleEntry<String, String>> fetchNewsCategory(String category) {
+        String apiKey = System.getenv("NEWS_API_KEY");
+        String apiUrl = "https://newsapi.org/v2/top-headlines?country=us&category=" + category + "&apiKey=" + apiKey;
+        List<AbstractMap.SimpleEntry<String, String>> newsList = new ArrayList<>();
+
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpGet request = new HttpGet(apiUrl);
+            try (CloseableHttpResponse response = httpClient.execute(request)) {
+                if (response.getStatusLine().getStatusCode() == 200) {
+                    String jsonResponse = EntityUtils.toString(response.getEntity());
+                    newsList = parseNewsResponse(jsonResponse);
+                } else {
+                    newsList.add(new AbstractMap.SimpleEntry<>("Не удалось получить новости. Статус: " + response.getStatusLine().getStatusCode(), ""));
+                }
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+            newsList.add(new AbstractMap.SimpleEntry<>("Ошибка при получении новостей.", ""));
+        }
+        return newsList;
+    }
+
+    public List<SimpleEntry<String, String>> parseNewsResponse(String jsonResponse) {
         List<SimpleEntry<String, String>> newsList = new ArrayList<>();
         try {
             ObjectMapper objectMapper = new ObjectMapper();
