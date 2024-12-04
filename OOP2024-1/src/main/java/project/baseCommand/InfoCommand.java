@@ -1,9 +1,9 @@
-package project.commands;
+package project.baseCommand;
 
 public class InfoCommand extends AbstractCommand{
 
     public String getDescription(){
-        return "Информаци о боте";
+        return "Информация о боте";
     }
 
     public String getMessage(){

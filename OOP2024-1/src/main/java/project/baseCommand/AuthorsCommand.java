@@ -1,9 +1,9 @@
-package project.commands;
+package project.baseCommand;
 
 public class AuthorsCommand extends AbstractCommand{
 
     public String getDescription(){
-        return "Перезапуск бота";
+        return "Авторы бота";
     }
 
     public String getMessage(){
