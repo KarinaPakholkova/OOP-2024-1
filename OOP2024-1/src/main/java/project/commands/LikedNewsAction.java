@@ -9,7 +9,7 @@ import project.database.DatabaseManager;
 import java.util.AbstractMap;
 import java.util.List;
 
-public class LikedNewsAction implements Action{
+public class LikedNewsAction implements Action {
 
     DatabaseManager dbManager = new DatabaseManager();
     StringBuilder likedNewsText = new StringBuilder("Вот ваши сохраненные новости:\n");
@@ -40,18 +40,26 @@ public class LikedNewsAction implements Action{
         Long userId = update.getMessage().getFrom().getId();
         String text;
 
-        int newsIndex = Integer.parseInt(userMessage) - 1;
-        DatabaseManager dbManager = new DatabaseManager();
         List<AbstractMap.SimpleEntry<String, String>> likedNewsList = dbManager.selectNews(userId);
 
-        if (newsIndex >= 0 && newsIndex < likedNewsList.size() && likedNewsList.get(newsIndex) != null) {
-            String newsTitle = String.valueOf(likedNewsList.get(newsIndex));
+        if (likedNewsList.isEmpty()) {
+            text = "У вас нет сохраненных новостей.";
+            return new SendMessage(chatId, text);
+        }
+
+        int newsIndex = Integer.parseInt(userMessage) - 1;
+
+        if (newsIndex >= 0 && newsIndex < likedNewsList.size()) {
+            String newsTitle = likedNewsList.get(newsIndex).getKey();
             String newsUrl = likedNewsList.get(newsIndex).getValue();
+
             dbManager.deleteLikedNew(userId, newsUrl);
-            text =  "Новость \"" + newsTitle + "\" была удалена.";
+
+            text = "Новость \"" + newsTitle + "\" была удалена.";
         } else {
             text = "Неверный номер. Пожалуйста, введите номер от 1 до " + likedNewsList.size() + ".";
         }
         return new SendMessage(chatId, text);
     }
 }
+

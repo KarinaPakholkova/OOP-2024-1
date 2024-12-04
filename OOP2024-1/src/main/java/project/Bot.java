@@ -2,23 +2,17 @@ package project;
 
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
-import org.telegram.telegrambots.meta.api.objects.replykeyboard.ReplyKeyboardMarkup;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import project.commands.Action;
 import project.commands.CategoryNewsAction;
 import project.commands.LatestNewsAction;
 import project.commands.LikedNewsAction;
-import project.database.DatabaseManager;
-import project.API.Api;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 
 import java.util.*;
-import java.util.AbstractMap.SimpleEntry;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static org.apache.commons.lang3.StringUtils.isNumeric;
 
 public class Bot extends TelegramLongPollingBot {
 

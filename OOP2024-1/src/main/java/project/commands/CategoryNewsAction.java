@@ -41,7 +41,7 @@ public class CategoryNewsAction implements Action{
 
         if (listOfCategory.contains(category)) {
             List<AbstractMap.SimpleEntry<String, String>> categoryNewsList = apiCategories.fetchNewsCategory(category);
-            categoryNewsText.append("Вот новости для категории '" + category + "':\n");
+            categoryNewsText.append("Вот новости для категории '").append(category).append("':\n");
             for (int i = 0; i < categoryNewsList.size(); i++) {
                 AbstractMap.SimpleEntry<String, String> news = categoryNewsList.get(i);
                 categoryNewsText.append(i + 1).append(". ").append(news.getKey()).append("\n").append(news.getValue()).append("\n");
@@ -50,8 +50,6 @@ public class CategoryNewsAction implements Action{
             categoryNewsText.append("Нет новостей для этой категории.\n" +
                     "Существующие категории: business, entertainment, general, health, science, sports, technology");
         }
-
-
         return new SendMessage(chatId, categoryNewsText.toString());
     }
 }
