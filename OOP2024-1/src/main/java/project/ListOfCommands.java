@@ -1,6 +1,6 @@
 package project;
 
-import project.commands.*;
+import project.baseCommand.*;
 import java.util.HashMap;
 import java.util.Set;
 
@@ -21,6 +21,7 @@ public class ListOfCommands {
         }
         Set obEntrySet = commandHashMap.entrySet();
         System.out.println(obEntrySet);
-        return text;    
+        return "Неверная команда";
     }
+
 }

@@ -1,4 +1,4 @@
-package project.commands;
+package project.baseCommand;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -22,6 +22,9 @@ public class HelpCommand extends AbstractCommand {
             String description = entry.getValue().getDescription();
             msg.append(commandText).append(" - ").append(description).append("\n");
         }
+        msg.append("/latestnews - Показывает последние пять новостей\n");
+        msg.append("/mylikednews - Показывает список сохраненных новостей\n");
+        msg.append("/category - показывает 5 популярных новостей выбранной категории\n");
         return msg.toString();
     }
 }

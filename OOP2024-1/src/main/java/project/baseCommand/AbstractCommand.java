@@ -1,4 +1,4 @@
-package project.commands;
+package project.baseCommand;
 
 public class AbstractCommand {
 
