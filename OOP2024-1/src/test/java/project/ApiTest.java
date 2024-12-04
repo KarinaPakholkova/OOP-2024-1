@@ -12,7 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import project.API.Api;
 
+import java.io.IOException;
 import java.util.AbstractMap;
 import java.util.List;
 
@@ -88,5 +90,39 @@ public class ApiTest {
         assertEquals(1, result.size());
         assertEquals("Ошибка при обработке новостей.", result.get(0).getKey());
         assertEquals("", result.get(0).getValue());
+    }
+
+    @Test
+    public void testFetchNewsCategory() throws IOException {
+        String json = "{ \"articles\": [ " +
+                "{ \"title\": \"Nintendo Expands Switch Online's NES Library With Another Classic Next Week - Nintendo Life\", \"url\": \"https://www.nintendolife.com/news/2024/12/nintendo-expands-switch-onlines-nes-library-with-another-classic-next-week\" }, " +
+                "{ \"title\": \"My Millennial Mind Is On Fire After Learning That These Items Were Staples In Most Pre-1980 Homes - BuzzFeed\", \"url\": \"https://www.buzzfeed.com/rossyoder/popular-household-items-before-1980-fs\" }, " +
+                "{ \"title\": \"The 40 Best Cyber Monday Laptop Deals - WIRED\", \"url\": \"https://www.wired.com/story/best-cyber-monday-laptop-deals-2024/\" }, " +
+                "{ \"title\": \"What’s new in Android’s December 2024 Google System Updates - 9to5Google\", \"url\": \"http://9to5google.com/2024/12/02/december-2024-google-system-updates/\" }, " +
+                "{ \"title\": \"New PlayStation handheld report backed up by Digital Foundry - Video Games Chronicle\", \"url\": \"https://www.videogameschronicle.com/news/new-playstation-handheld-report-backed-up-by-digital-foundry/\" }, " +
+                "] }";
+        StringEntity entity = new StringEntity(json);
+
+        when(httpClient.execute(any(HttpGet.class))).thenReturn(response);
+        when(response.getEntity()).thenReturn(entity);
+
+        List<AbstractMap.SimpleEntry<String, String>> result = api.fetchNewsCategory("technology");
+
+        assertEquals(5, result.size());
+
+        assertTrue(result.get(0).getKey().contains("Nintendo Expands Switch Online's NES Library With Another Classic Next Week - Nintendo Life"));
+        assertEquals("https://www.nintendolife.com/news/2024/12/nintendo-expands-switch-onlines-nes-library-with-another-classic-next-week", result.get(0).getValue());
+
+        assertTrue(result.get(1).getKey().contains("My Millennial Mind Is On Fire After Learning That These Items Were Staples In Most Pre-1980 Homes - BuzzFeed"));
+        assertEquals("https://www.buzzfeed.com/rossyoder/popular-household-items-before-1980-fs", result.get(1).getValue());
+
+        assertTrue(result.get(2).getKey().contains("The 40 Best Cyber Monday Laptop Deals - WIRED"));
+        assertEquals("https://www.wired.com/story/best-cyber-monday-laptop-deals-2024/", result.get(2).getValue());
+
+        assertTrue(result.get(3).getKey().contains("What’s new in Android’s December 2024 Google System Updates - 9to5Google"));
+        assertEquals("http://9to5google.com/2024/12/02/december-2024-google-system-updates/", result.get(3).getValue());
+
+        assertTrue(result.get(4).getKey().contains("New PlayStation handheld report backed up by Digital Foundry - Video Games Chronicle"));
+        assertEquals("https://www.videogameschronicle.com/news/new-playstation-handheld-report-backed-up-by-digital-foundry/", result.get(4).getValue());
     }
 }

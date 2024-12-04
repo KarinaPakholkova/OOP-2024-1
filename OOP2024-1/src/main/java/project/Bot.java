@@ -9,11 +9,8 @@ import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import project.database.DatabaseManager;
 import project.API.Api;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.AbstractMap;
 
 import static org.apache.commons.lang3.StringUtils.isNumeric;
 
@@ -21,6 +18,7 @@ public class Bot extends TelegramLongPollingBot {
     private static final Map<String, String> buttonTextToUrlMap = new HashMap<>();
     Boolean myLikedNewsCalled;
     Boolean deleteNews = false;
+    List<String> listOfCategory = new ArrayList<>(Arrays.asList("business", "entertainment", "general", "health", "science", "sports", "technology"));
 
 
     public String getBotUsername() {
@@ -71,17 +69,19 @@ public class Bot extends TelegramLongPollingBot {
 
                 } else if (userMessage.startsWith("/category ")) {
                     String category = userMessage.substring(9).trim(); // Извлекаем категорию
-                    Api apiCategories = new Api();
-                    List<AbstractMap.SimpleEntry<String, String>> categoryNewsList = apiCategories.fetchNewsCategory(category); // Получаем новости по категории
+                    Api apiCategories = new Api();// Получаем новости по категории
+                    StringBuilder categoryNewsText = new StringBuilder();
 
-                    StringBuilder categoryNewsText = new StringBuilder("Вот новости для категории '" + category + "':\n");
-                    if (categoryNewsList.isEmpty()) {
-                        categoryNewsText.append("Нет новостей для этой категории.");
-                    } else {
+                    if (listOfCategory.contains(category)) {
+                        List<AbstractMap.SimpleEntry<String, String>> categoryNewsList = apiCategories.fetchNewsCategory(category);
+                        categoryNewsText.append("Вот новости для категории '" + category + "':\n");
                         for (int i = 0; i < categoryNewsList.size(); i++) {
                             AbstractMap.SimpleEntry<String, String> news = categoryNewsList.get(i);
                             categoryNewsText.append(i + 1).append(". ").append(news.getKey()).append("\n").append(news.getValue()).append("\n");
                         }
+                    } else {
+                        categoryNewsText.append("Нет новостей для этой категории.\n" +
+                                "Существующие категории: business, entertainment, general, health, science, sports, technology");
                     }
 
                     SendMessage categoryNewsMessage = new SendMessage();
@@ -145,7 +145,7 @@ public class Bot extends TelegramLongPollingBot {
         }
     }
 
-    private void sendMessage(String chatId, String messageText) throws TelegramApiException {
+    void sendMessage(String chatId, String messageText) throws TelegramApiException {
         SendMessage outMessage = new SendMessage();
         outMessage.setChatId(chatId);
         outMessage.setText(messageText);

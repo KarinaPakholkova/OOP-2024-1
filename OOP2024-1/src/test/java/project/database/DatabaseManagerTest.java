@@ -2,19 +2,15 @@ package project.database;
 
 import static org.mockito.Mockito.*;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.AbstractMap;
+import java.util.List;
 
 public class DatabaseManagerTest {
     @Mock
@@ -49,7 +45,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testInsertLikedNew() throws SQLException {
-        Long userId = 123456L;
+        long userId = 123456L;
         String headlines = "Test Headline";
         String url = "http://example.com";
 
@@ -64,7 +60,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testInsertLikedNew_SQLException() throws SQLException {
-        Long userId = 123456L;
+        long userId = 123456L;
         String headlines = "Test Headline";
         String url = "http://example.com";
 
@@ -80,7 +76,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testDeleteLikedNew() throws SQLException {
-        Long userId = 123456L;
+        long userId = 123456L;
         String url = "http://example.com";
 
         databaseManager.deleteLikedNew(userId, url);
@@ -92,7 +88,7 @@ public class DatabaseManagerTest {
 
     @Test
     public void testDeleteLikedNew_SQLException() throws SQLException {
-        Long userId = 123L;
+        long userId = 123L;
         String url = "http://example.com";
 
         doThrow(new SQLException("Ошибка при удалении")).when(preparedStatement).executeUpdate();
@@ -102,5 +98,70 @@ public class DatabaseManagerTest {
         verify(preparedStatement, times(1)).setLong(1, userId);
         verify(preparedStatement, times(1)).setString(2, url);
         verify(preparedStatement, times(1)).executeUpdate();
+    }
+
+    @Test
+    public void testSelectNews_Success() throws SQLException {
+        long userId = 123456L;
+        String headline = "Test Headline";
+        String url = "http://example.com";
+
+        // Настраиваем моки для ResultSet
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.next()).thenReturn(true).thenReturn(false); // Один результат
+        when(resultSet.getString("headline")).thenReturn(headline);
+        when(resultSet.getString("url")).thenReturn(url);
+
+        // Настраиваем поведение мока для PreparedStatement
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+
+        List<AbstractMap.SimpleEntry<String, String>> likedNews = databaseManager.selectNews(userId);
+
+        // Проверяем, что результат содержит ожидаемую новость
+        Assertions.assertEquals(1, likedNews.size());
+        Assertions.assertEquals(headline, likedNews.getFirst().getKey());
+        Assertions.assertEquals(url, likedNews.getFirst().getValue());
+
+        // Убедимся, что методы были вызваны с правильными параметрами
+        verify(preparedStatement, times(1)).setLong(1, userId);
+        verify(preparedStatement, times(1)).executeQuery();
+    }
+
+    @Test
+    public void testSelectNews_NoResults() throws SQLException {
+        long userId = 123456L;
+
+        // Настраиваем моки для ResultSet
+        ResultSet resultSet = mock(ResultSet.class);
+        when(resultSet.next()).thenReturn(false); // Нет результатов
+
+        // Настраиваем поведение мока для PreparedStatement
+        when(preparedStatement.executeQuery()).thenReturn(resultSet);
+
+        List<AbstractMap.SimpleEntry<String, String>> likedNews = databaseManager.selectNews(userId);
+
+        // Проверяем, что результат пустой
+        Assertions.assertTrue(likedNews.isEmpty());
+
+        // Убедимся, что методы были вызваны с правильными параметрами
+        verify(preparedStatement, times(1)).setLong(1, userId);
+        verify(preparedStatement, times(1)).executeQuery();
+    }
+
+    @Test
+    public void testSelectNews_SQLException() throws SQLException {
+        long userId = 123456L;
+
+        // Настраиваем поведение мока для PreparedStatement
+        doThrow(new SQLException("Database error")).when(preparedStatement).executeQuery();
+
+        List<AbstractMap.SimpleEntry<String, String>> likedNews = databaseManager.selectNews(userId);
+
+        // Проверяем, что результат пустой при возникновении исключения
+        Assertions.assertTrue(likedNews.isEmpty());
+
+        // Убедимся, что методы были вызваны с правильными параметрами
+        verify(preparedStatement, times(1)).setLong(1, userId);
+        verify(preparedStatement, times(1)).executeQuery();
     }
 }
