@@ -55,6 +55,25 @@ public class BDForMailingList {
         disconnect();
     }
 
+    public List<AbstractMap.SimpleEntry<String, String>> selectMailingList() {
+        connect();
+        List<AbstractMap.SimpleEntry<String, String>> data = new ArrayList<>();
+        String sql = "SELECT userid, category FROM mailing_list";
+
+        try (PreparedStatement prSt = connection.prepareStatement(sql)) {
+            ResultSet resultSet = prSt.executeQuery();
+            while (resultSet.next()) {
+                String chatId = resultSet.getString("userid");
+                String category = resultSet.getString("category");
+                data.add(new AbstractMap.SimpleEntry<>(chatId, category));
+            }
+        } catch (SQLException e) {
+            System.err.println("Ошибка при получении записей: " + e.getMessage());
+        }
+        disconnect();
+        return data;
+    }
+
     // Метод для закрытия соединения с базой данных
     public void disconnect () {
         if (connection != null) {
