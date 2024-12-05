@@ -47,7 +47,7 @@ public class MailingList implements Runnable {
         scheduler.scheduleAtFixedRate(this, 0, 10, TimeUnit.SECONDS);
     }
 
-    private void sendHourlyMessage() throws TelegramApiException {
+    void sendHourlyMessage() throws TelegramApiException {
         for (AbstractMap.SimpleEntry<String, String> entry : chatIds) {
             String chatId = entry.getKey();
             String category = entry.getValue();
