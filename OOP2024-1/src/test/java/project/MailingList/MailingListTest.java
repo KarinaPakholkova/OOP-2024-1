@@ -40,10 +40,9 @@ public class MailingListTest {
 
     @Test
     public void testSendHourlyMessage_Success() throws Exception {
-        // Arrange
         List<AbstractMap.SimpleEntry<String, String>> chatIds = Arrays.asList(
                 new AbstractMap.SimpleEntry<>("12345", "sports"),
-                new AbstractMap.SimpleEntry<>("67890", "news")
+                new AbstractMap.SimpleEntry<>("67890", "general")
         );
 
         List<AbstractMap.SimpleEntry<String, String>> newsList = Arrays.asList(
@@ -53,7 +52,7 @@ public class MailingListTest {
 
         when(dbManager.selectMailingList()).thenReturn(chatIds);
         when(apiCategories.fetchNewsCategory("sports")).thenReturn(newsList);
-        when(apiCategories.fetchNewsCategory("news")).thenReturn(newsList);
+        when(apiCategories.fetchNewsCategory("general")).thenReturn(newsList);
 
         mailingList.sendHourlyMessage();
 
@@ -61,8 +60,8 @@ public class MailingListTest {
         verify(bot, times(2)).execute(messageCaptor.capture());
 
         List<SendMessage> messages = messageCaptor.getAllValues();
-        assertEquals("Рассылка новостей по категории 'sports':\n1. News Title 1\nNews Description 1\n2. News Title 2\n", messages.get(0).getText());
-        assertEquals("Рассылка новостей по категории 'news':\n1. News Title 1\nNews Description 1\n2. News Title 2\n", messages.get(1).getText());
+        assertEquals("Рассылка новостей по категории 'sports':\n1. News Title 1\nNews Description 1\n2. News Title 2\nNews Description 2\n", messages.get(0).getText());
+        assertEquals("Рассылка новостей по категории 'general':\n1. News Title 1\nNews Description 1\n2. News Title 2\nNews Description 2\n", messages.get(1).getText());
     }
 
     @Test
@@ -85,7 +84,6 @@ public class MailingListTest {
 
     @Test
     public void testSendHourlyMessage_ErrorInFetchingNews() throws Exception {
-
         List<AbstractMap.SimpleEntry<String, String>> chatIds = Arrays.asList(
                 new AbstractMap.SimpleEntry<>("12345", "sports")
         );
