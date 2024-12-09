@@ -17,7 +17,6 @@ import java.util.concurrent.TimeUnit;
 public class MailingList implements Runnable {
     BDForMailingList dbManager = new BDForMailingList();
     Api apiCategories = new Api();
-    private final List<AbstractMap.SimpleEntry<String, String>> chatIds;
     private final Bot bot;
 
     List<String> listOfErrors = new ArrayList<>(Arrays.asList(
@@ -29,7 +28,6 @@ public class MailingList implements Runnable {
     ));
 
     public MailingList(Bot bot) {
-        this.chatIds = dbManager.selectMailingList();
         this.bot = bot;
     }
 
@@ -48,6 +46,7 @@ public class MailingList implements Runnable {
     }
 
     void sendHourlyMessage() throws TelegramApiException {
+        List<AbstractMap.SimpleEntry<String, String>> chatIds = dbManager.selectMailingList();
         for (AbstractMap.SimpleEntry<String, String> entry : chatIds) {
             String chatId = entry.getKey();
             String category = entry.getValue();
