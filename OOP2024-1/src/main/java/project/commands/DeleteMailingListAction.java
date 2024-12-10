@@ -6,14 +6,14 @@ import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import project.database.BDForMailingList;
 
-public class AddMailingListAction implements Action {
+public class DeleteMailingListAction implements Action {
     BDForMailingList dbManager = new BDForMailingList();
 
     @Override
     public BotApiMethod handle(Update update) {
         Message msg = update.getMessage();
         String chatId = msg.getChatId().toString();
-        String text = "Выберите категорию для рассылки: business, entertainment, general, health, science, sports, technology";
+        String text = "Выберите категорию, рассылку для которой хотите удалить: business, entertainment, general, health, science, sports, technology";
 
         return new SendMessage(chatId, text);
     }
@@ -27,10 +27,9 @@ public class AddMailingListAction implements Action {
         String text;
 
         if (listOfCategory.contains(category)) {
-            dbManager.insertUser(userId, category);
-            text = "Рассылка успешно подключена";
-        }
-        else {
+            dbManager.deleteUser(userId, category);
+            text = "Рассылка успешно удалена";
+        } else {
             text = "Такой категории не существует.\n" +
                     "Существующие категории: business, entertainment, general, health, science, sports, technology";
         }

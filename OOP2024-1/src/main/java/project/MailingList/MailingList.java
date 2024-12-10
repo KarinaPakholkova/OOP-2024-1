@@ -4,6 +4,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 import project.API.Api;
 import project.Bot;
+import project.auxiliaryFunctions.CreateString;
 import project.database.BDForMailingList;
 
 import java.util.AbstractMap;
@@ -17,7 +18,9 @@ import java.util.concurrent.TimeUnit;
 public class MailingList implements Runnable {
     BDForMailingList dbManager = new BDForMailingList();
     Api apiCategories = new Api();
+    CreateString categoryObj = new CreateString();
     private final Bot bot;
+    StringBuilder messageText = new StringBuilder();
 
     List<String> listOfErrors = new ArrayList<>(Arrays.asList(
             "Не удалось получить новости. Статус: 400",
@@ -50,31 +53,17 @@ public class MailingList implements Runnable {
         for (AbstractMap.SimpleEntry<String, String> entry : chatIds) {
             String chatId = entry.getKey();
             String category = entry.getValue();
-            StringBuilder messageText = new StringBuilder();
-            List<AbstractMap.SimpleEntry<String, String>> categoryNewsList = apiCategories.fetchNewsCategory(category);
+            messageText.setLength(0);
+            messageText = categoryObj.printCategoryNews(category);
 
-            messageText.append("Рассылка новостей по категории '").append(category).append("':\n");
+            boolean hasError = listOfErrors.stream().anyMatch(messageText.toString()::contains);
 
-            for (int i = 0; i < categoryNewsList.size(); i++) {
-                AbstractMap.SimpleEntry<String, String> news = categoryNewsList.get(i);
-                messageText.append(i + 1).append(". ").append(news.getKey()).append("\n").append(news.getValue()).append("\n");
-            }
-
-            if (categoryNewsList.isEmpty() || containsErrorMessage(categoryNewsList)) {
+            if (messageText.isEmpty() || hasError) {
                 sendMessage(chatId, "К сожалению, не удалось получить новости для категории: " + category);
             } else {
                 sendMessage(chatId, messageText.toString());
             }
         }
-    }
-
-    private boolean containsErrorMessage(List<AbstractMap.SimpleEntry<String, String>> messageText) {
-        for (AbstractMap.SimpleEntry<String, String> entry : messageText) {
-            if (listOfErrors.contains(entry.getKey())) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private void sendMessage(String chatId, String text) throws TelegramApiException {
