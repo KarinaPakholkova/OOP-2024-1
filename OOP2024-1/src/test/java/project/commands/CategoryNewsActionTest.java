@@ -6,9 +6,7 @@ import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Message;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import project.API.Api;
-
-import java.util.AbstractMap;
-import java.util.List;
+import project.auxiliaryFunctions.CreateString;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
@@ -17,16 +15,20 @@ class CategoryNewsActionTest {
 
     private CategoryNewsAction categoryNewsAction;
     private Api mockApi;
+    private CreateString mockCreateString;
 
     @BeforeEach
     void setUp() {
-        mockApi = mock(Api.class); // Мокаем api
+        mockApi = mock(Api.class); // Мокаем апи
+        mockCreateString = mock(CreateString.class);
         categoryNewsAction = new CategoryNewsAction();
-        categoryNewsAction.apiCategories = mockApi; // Инжектим мок
+        categoryNewsAction.apiCategories = mockApi; // инжектим апи
+        categoryNewsAction.categoryObj = mockCreateString;
     }
 
     @Test
     void testBotMessageWithCategories() {
+        // мокаем сообщение
         Update update = mock(Update.class);
         Message message = mock(Message.class);
 
@@ -48,24 +50,19 @@ class CategoryNewsActionTest {
         when(message.getChatId()).thenReturn(12345L);
         when(message.getText()).thenReturn("business");
 
-        // Мокаем ответ API
-        List<AbstractMap.SimpleEntry<String, String>> mockNews = List.of(
-                new AbstractMap.SimpleEntry<>("News Title 1", "News Link 1"),
-                new AbstractMap.SimpleEntry<>("News Title 2", "News Link 2")
-        );
-        when(mockApi.fetchNewsCategory("business")).thenReturn(mockNews);
-
-        SendMessage response = (SendMessage) categoryNewsAction.callback(update);
-
-        assertEquals("12345", response.getChatId());
-        String expectedText = """
+        StringBuilder mockCategoryNews = new StringBuilder("""
                 Вот новости для категории 'business':
                 1. News Title 1
                 News Link 1
                 2. News Title 2
                 News Link 2
-                """;
-        assertEquals(expectedText, response.getText());
+                """);
+        when(mockCreateString.printCategoryNews("business")).thenReturn(mockCategoryNews);
+
+        SendMessage response = (SendMessage) categoryNewsAction.callback(update);
+
+        assertEquals("12345", response.getChatId());
+        assertEquals(mockCategoryNews.toString(), response.getText());
     }
 
     @Test

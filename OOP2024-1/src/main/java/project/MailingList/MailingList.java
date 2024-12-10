@@ -2,7 +2,6 @@ package project.MailingList;
 
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import project.API.Api;
 import project.Bot;
 import project.auxiliaryFunctions.CreateString;
 import project.database.BDForMailingList;
@@ -17,7 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 public class MailingList implements Runnable {
     BDForMailingList dbManager = new BDForMailingList();
-    Api apiCategories = new Api();
     CreateString categoryObj = new CreateString();
     private final Bot bot;
     StringBuilder messageText = new StringBuilder();
@@ -66,7 +64,7 @@ public class MailingList implements Runnable {
         }
     }
 
-    private void sendMessage(String chatId, String text) throws TelegramApiException {
+    void sendMessage(String chatId, String text) throws TelegramApiException {
         SendMessage message = new SendMessage();
         message.setChatId(chatId);
         message.setText(text);

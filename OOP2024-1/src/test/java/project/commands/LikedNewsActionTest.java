@@ -44,7 +44,7 @@ class LikedNewsActionTest {
         SendMessage response = (SendMessage) likedNewsAction.handle(update);
 
         assertEquals("12345", response.getChatId());
-        assertEquals("Вот ваши сохраненные новости:\nУ вас нет сохраненных новостей.", response.getText());
+        assertEquals("У вас нет сохраненных новостей.", response.getText());
     }
 
     @Test
@@ -67,9 +67,13 @@ class LikedNewsActionTest {
         SendMessage response = (SendMessage) likedNewsAction.handle(update);
 
         assertEquals("12345", response.getChatId());
-        String expectedText = "Вот ваши сохраненные новости:\n" +
-                "1. News Title 1\nNews Link 1\n" +
-                "2. News Title 2\nNews Link 2\n";
+        String expectedText = """
+                Вот ваши сохраненные новости:
+                1. News Title 1
+                News Link 1
+                2. News Title 2
+                News Link 2
+                """;
         assertEquals(expectedText, response.getText());
     }
 

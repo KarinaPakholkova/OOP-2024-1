@@ -12,7 +12,7 @@ import java.util.List;
 public class LikedNewsAction implements Action {
 
     DatabaseManager dbManager = new DatabaseManager();
-    StringBuilder likedNewsText = new StringBuilder("Вот ваши сохраненные новости:\n");
+    StringBuilder likedNewsText = new StringBuilder();
 
     @Override
     public BotApiMethod handle(Update update) {
@@ -21,9 +21,12 @@ public class LikedNewsAction implements Action {
         Long userId = update.getMessage().getFrom().getId();
         List<AbstractMap.SimpleEntry<String, String>> likedNewsList = dbManager.selectNews(userId);
 
+        likedNewsText.setLength(0);
+
         if (likedNewsList.isEmpty()) {
             likedNewsText.append("У вас нет сохраненных новостей.");
         } else {
+            likedNewsText.append("Вот ваши сохраненные новости:\n");
             for (int i = 0; i < likedNewsList.size(); i++) {
                 AbstractMap.SimpleEntry<String, String> news = likedNewsList.get(i);
                 likedNewsText.append(i + 1).append(". ").append(news.getKey()).append("\n").append(news.getValue()).append("\n");

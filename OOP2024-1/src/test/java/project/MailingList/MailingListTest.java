@@ -6,15 +6,15 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
-import project.API.Api;
 import project.Bot;
+import project.auxiliaryFunctions.CreateString;
 import project.database.BDForMailingList;
 
 import java.util.AbstractMap;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.Mockito.*;
 
 public class MailingListTest {
@@ -26,7 +26,7 @@ public class MailingListTest {
     private BDForMailingList dbManager;
 
     @Mock
-    private Api apiCategories;
+    private CreateString categoryObj;
 
     private MailingList mailingList;
 
@@ -35,7 +35,7 @@ public class MailingListTest {
         MockitoAnnotations.openMocks(this);
         mailingList = new MailingList(bot);
         mailingList.dbManager = dbManager;
-        mailingList.apiCategories = apiCategories;
+        mailingList.categoryObj = categoryObj;
     }
 
     @Test
@@ -45,14 +45,9 @@ public class MailingListTest {
                 new AbstractMap.SimpleEntry<>("67890", "general")
         );
 
-        List<AbstractMap.SimpleEntry<String, String>> newsList = Arrays.asList(
-                new AbstractMap.SimpleEntry<>("News Title 1", "News Description 1"),
-                new AbstractMap.SimpleEntry<>("News Title 2", "News Description 2")
-        );
-
         when(dbManager.selectMailingList()).thenReturn(chatIds);
-        when(apiCategories.fetchNewsCategory("sports")).thenReturn(newsList);
-        when(apiCategories.fetchNewsCategory("general")).thenReturn(newsList);
+        when(categoryObj.printCategoryNews("sports")).thenReturn(new StringBuilder("Sports News Content"));
+        when(categoryObj.printCategoryNews("general")).thenReturn(new StringBuilder("General News Content"));
 
         mailingList.sendHourlyMessage();
 
@@ -60,18 +55,18 @@ public class MailingListTest {
         verify(bot, times(2)).execute(messageCaptor.capture());
 
         List<SendMessage> messages = messageCaptor.getAllValues();
-        assertEquals("Рассылка новостей по категории 'sports':\n1. News Title 1\nNews Description 1\n2. News Title 2\nNews Description 2\n", messages.get(0).getText());
-        assertEquals("Рассылка новостей по категории 'general':\n1. News Title 1\nNews Description 1\n2. News Title 2\nNews Description 2\n", messages.get(1).getText());
+        assertEquals("Sports News Content", messages.get(0).getText());
+        assertEquals("General News Content", messages.get(1).getText());
     }
 
     @Test
     public void testSendHourlyMessage_NoNews() throws Exception {
-        List<AbstractMap.SimpleEntry<String, String>> chatIds = Arrays.asList(
+        List<AbstractMap.SimpleEntry<String, String>> chatIds = List.of(
                 new AbstractMap.SimpleEntry<>("12345", "sports")
         );
 
         when(dbManager.selectMailingList()).thenReturn(chatIds);
-        when(apiCategories.fetchNewsCategory("sports")).thenReturn(Arrays.asList());
+        when(categoryObj.printCategoryNews("sports")).thenReturn(new StringBuilder());
 
         mailingList.sendHourlyMessage();
 
@@ -84,14 +79,12 @@ public class MailingListTest {
 
     @Test
     public void testSendHourlyMessage_ErrorInFetchingNews() throws Exception {
-        List<AbstractMap.SimpleEntry<String, String>> chatIds = Arrays.asList(
+        List<AbstractMap.SimpleEntry<String, String>> chatIds = List.of(
                 new AbstractMap.SimpleEntry<>("12345", "sports")
         );
 
         when(dbManager.selectMailingList()).thenReturn(chatIds);
-        when(apiCategories.fetchNewsCategory("sports")).thenReturn(
-                Arrays.asList(new AbstractMap.SimpleEntry<>("Не удалось получить новости. Статус: 400", ""))
-        );
+        when(categoryObj.printCategoryNews("sports")).thenReturn(new StringBuilder("Не удалось получить новости. Статус: 400"));
 
         mailingList.sendHourlyMessage();
 
