@@ -25,6 +25,9 @@ public class HelpCommand extends AbstractCommand {
         msg.append("/latestnews - Показывает последние пять новостей\n");
         msg.append("/mylikednews - Показывает список сохраненных новостей\n");
         msg.append("/category - показывает 5 популярных новостей выбранной категории\n");
+        msg.append("/addmailinglist - создает рассылку по выбранной категории\n");
+        msg.append("/deletemailinglist - удаляет рассылку по выбранной категории\n");
+
         return msg.toString();
     }
 }

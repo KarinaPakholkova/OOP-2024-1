@@ -4,10 +4,7 @@ import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.meta.api.methods.send.SendMessage;
 import org.telegram.telegrambots.meta.api.objects.Update;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
-import project.commands.Action;
-import project.commands.CategoryNewsAction;
-import project.commands.LatestNewsAction;
-import project.commands.LikedNewsAction;
+import project.commands.*;
 import org.telegram.telegrambots.meta.api.methods.BotApiMethod;
 
 import java.util.*;
@@ -19,7 +16,10 @@ public class Bot extends TelegramLongPollingBot {
     Map<String, Action> actions = Map.of(
             "/category", new CategoryNewsAction(),
             "/latestnews", new LatestNewsAction(),
-            "/mylikednews", new LikedNewsAction()
+            "/mylikednews", new LikedNewsAction(),
+            "/addmailinglist", new AddMailingListAction(),
+            "/deletemailinglist", new DeleteMailingListAction()
+
     );
 
     private final Map<String, String> bindingBy = new ConcurrentHashMap<>();
@@ -81,5 +81,3 @@ public class Bot extends TelegramLongPollingBot {
     }
 
 }
-
-
