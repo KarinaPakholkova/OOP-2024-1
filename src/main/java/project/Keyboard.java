@@ -8,7 +8,6 @@ import java.util.*;
 
 public class Keyboard {
     private static final Map<String, String> buttonTextToCommandMap = new HashMap<>();
-    // поменял пока что на просто цифры ибо немного поломал все
     static {
         buttonTextToCommandMap.put("1", "1");
         buttonTextToCommandMap.put("2", "2");
