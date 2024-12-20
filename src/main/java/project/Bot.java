@@ -18,7 +18,8 @@ public class Bot extends TelegramLongPollingBot {
             "/latestnews", new LatestNewsAction(),
             "/mylikednews", new LikedNewsAction(),
             "/addmailinglist", new AddMailingListAction(),
-            "/deletemailinglist", new DeleteMailingListAction()
+            "/deletemailinglist", new DeleteMailingListAction(),
+            "/rate", new RateAction()
 
     );
 
@@ -44,7 +45,8 @@ public class Bot extends TelegramLongPollingBot {
                 if (userMessage.equals("/latestnews") || userMessage.equals("/mylikednews")){
                     String message;
                     if (userMessage.equals("/latestnews")) {
-                        message = "Если хотите сохранить новость, введите ее номер, если нет - введите /q";
+                        message = "Если хотите сохранить новость, введите ее номер, если нет - введите /q" +
+                                "Чтобы оценить новость напишите /rate";
                     }
                     else {
                         message = "Если хотите удалить новость, введите ее номер, если нет - введите /q";

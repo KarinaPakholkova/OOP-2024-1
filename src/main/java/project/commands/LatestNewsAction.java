@@ -17,7 +17,7 @@ public class LatestNewsAction implements Action {
     Api api = new Api();
     String[] headlines = new String[5];
     List<AbstractMap.SimpleEntry<String, String>> newsList = api.fetchLatestNews();
-    private static final Map<String, String> buttonTextToUrlMap = new HashMap<>();
+    static final Map<String, String> buttonTextToUrlMap = new HashMap<>();
 
     @Override
     public BotApiMethod handle(Update update) {
@@ -42,6 +42,10 @@ public class LatestNewsAction implements Action {
         String userMessage = msg.getText();
         if (userMessage.equals("/q")){
             return null;
+        } else if (userMessage.equals("/rate"))
+        {
+            RateAction rateAction = new RateAction();
+            return rateAction.callback(update);
         } else {
             Long userId = update.getMessage().getFrom().getId();
             // Обработка нажатия на кнопку с новостью
