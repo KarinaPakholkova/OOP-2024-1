@@ -34,7 +34,7 @@ class RateActionTest {
 
         SendMessage response = (SendMessage) rateAction.handle(update);
 
-        assertEquals("Выберите новость, которую хотите оценить и укажите через пробел оценку от 1 до 5", response.getText());
+        assertEquals("Выберите новость, которую хотите оценить, и укажите через пробел оценку от 1 до 5.", response.getText());
         assertEquals("12345", response.getChatId());
     }
 
@@ -47,13 +47,14 @@ class RateActionTest {
         when(message.getChatId()).thenReturn(12345L);
         when(message.getText()).thenReturn("1 5");
 
-        when(mockDatabase.selectRating("http://example.com/news1")).thenReturn(List.of(-1));
+        when(mockDatabase.selectRating("http://example.com/news1")).thenReturn(List.of("Новость не найдена"));
 
         LatestNewsAction.buttonTextToUrlMap.put("1", "http://example.com/news1");
+        LatestNewsAction.headlines[0] = "Example News Title"; // Set a headline for the test
 
         SendMessage response = (SendMessage) rateAction.callback(update);
 
-        verify(mockDatabase, times(1)).insertRating("http://example.com/news1", 5);
+        verify(mockDatabase, times(1)).insertRating("Example News Title", "http://example.com/news1", 5);
 
         assertEquals("Вы оценили статью #1 на 5", response.getText());
         assertEquals("12345", response.getChatId());
@@ -68,7 +69,7 @@ class RateActionTest {
         when(message.getChatId()).thenReturn(12345L);
         when(message.getText()).thenReturn("1 4");
 
-        when(mockDatabase.selectRating("http://example.com/news1")).thenReturn(List.of(3, 2));
+        when(mockDatabase.selectRating("http://example.com/news1")).thenReturn(List.of("Some Title", "http://example.com/news1", 3, 2));
 
         LatestNewsAction.buttonTextToUrlMap.put("1", "http://example.com/news1");
 
@@ -88,9 +89,10 @@ class RateActionTest {
         when(update.getMessage()).thenReturn(message);
         when(message.getChatId()).thenReturn(12345L);
         when(message.getText()).thenReturn("invalid input");
+
         SendMessage response = (SendMessage) rateAction.callback(update);
 
-        assertEquals("Неверный формат. Убедитесь, что вы указали номер статьи и оценку через пробел (например: 1 5).", response.getText());
+        assertEquals("Неверный формат. Укажите номер статьи и оценку через пробел (например: 1 5).", response.getText());
         assertEquals("12345", response.getChatId());
     }
 
@@ -108,6 +110,7 @@ class RateActionTest {
         assertEquals("Оценка должна быть числом от 1 до 5.", response.getText());
         assertEquals("12345", response.getChatId());
     }
+
 
     @Test
     void testCallback_InvalidArticleNumber() {

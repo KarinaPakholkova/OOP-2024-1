@@ -19,9 +19,11 @@ public class Bot extends TelegramLongPollingBot {
             "/mylikednews", new LikedNewsAction(),
             "/addmailinglist", new AddMailingListAction(),
             "/deletemailinglist", new DeleteMailingListAction(),
-            "/rate", new RateAction()
+            "/rate", new RateAction(),
+            "/topnews", new TopNewsAction()
 
-    );
+
+            );
 
     private final Map<String, String> bindingBy = new ConcurrentHashMap<>();
 

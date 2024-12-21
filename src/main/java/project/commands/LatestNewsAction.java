@@ -15,7 +15,7 @@ import java.util.Map;
 public class LatestNewsAction implements Action {
 
     Api api = new Api();
-    String[] headlines = new String[5];
+    static String[] headlines = new String[5];
     List<AbstractMap.SimpleEntry<String, String>> newsList = api.fetchLatestNews();
     static final Map<String, String> buttonTextToUrlMap = new HashMap<>();
 
