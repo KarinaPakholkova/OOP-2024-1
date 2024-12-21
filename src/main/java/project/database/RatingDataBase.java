@@ -10,14 +10,15 @@ public class RatingDataBase {
     DataBaseConnection DBConnect = new DataBaseConnection();
 
     // Метод для добавления нового рейтинга для новости
-    public void insertRating(String url, int rating) {
+    public void insertRating(String headline, String url, int rating) {
         DBConnect.connect();
-        String sql = "INSERT INTO rating (url, rating, count) VALUES (?, ?, ?)";
+        String sql = "INSERT INTO rating (headline, url, rating, count) VALUES (?, ?, ?, ?)";
 
         try (PreparedStatement prSt = DBConnect.connection.prepareStatement(sql)) {
-            prSt.setString(1, url);
-            prSt.setInt(2, rating);
-            prSt.setInt(3, 1);
+            prSt.setString(1, headline);
+            prSt.setString(2, url);
+            prSt.setInt(3, rating);
+            prSt.setInt(4, 1);
             prSt.executeUpdate();
             System.out.println("Оценка успешно добавлена.");
         } catch (SQLException e) {
@@ -27,22 +28,24 @@ public class RatingDataBase {
     }
 
     // селектор рейтинга
-    public List<Integer> selectRating(String url) {
-        List<Integer> resultList = new ArrayList<>();
+    public List<Object> selectRating(String url) {
+        List<Object> resultList = new ArrayList<>();
         DBConnect.connect();
-        String sql = "SELECT rating, count FROM rating WHERE url = ?;";
+        String sql = "SELECT headline, rating, count FROM rating WHERE url = ?;";
 
         try (PreparedStatement prSt = DBConnect.connection.prepareStatement(sql)) {
             prSt.setString(1, url);
             ResultSet resultSet = prSt.executeQuery();
 
             if (resultSet.next()) {
+                String headline = resultSet.getString("headline");
                 int rating = resultSet.getInt("rating");
                 int count = resultSet.getInt("count");
+                resultList.add(headline);
                 resultList.add(rating);
                 resultList.add(count);
             } else {
-                resultList.add(-1);
+                resultList.add("Новость не найдена");
             }
         } catch (SQLException e) {
             System.err.println("Ошибка при получении оценки: " + e.getMessage());
@@ -68,5 +71,37 @@ public class RatingDataBase {
             System.err.println("Ошибка при обновлении оценки: " + e.getMessage());
         }
         DBConnect.disconnect();
+    }
+
+    public List<String> getHighestRatedUrls() {
+        List<String> highestRatedUrls = new ArrayList<>();
+        DBConnect.connect();
+
+        String sql = """
+            SELECT headline, url, rating
+            FROM rating
+            ORDER BY rating DESC
+            LIMIT 5;
+            """;
+
+        try (PreparedStatement prSt = DBConnect.connection.prepareStatement(sql)) {
+            ResultSet resultSet = prSt.executeQuery();
+
+            while (resultSet.next()) {
+                String headline = resultSet.getString("headline");
+                String url = resultSet.getString("url");
+                int rating = resultSet.getInt("rating");
+                highestRatedUrls.add(headline + " - " + url + " - Rating: " + rating);
+            }
+        } catch (SQLException e) {
+            System.err.println("Ошибка при получении ссылок с самым высоким рейтингом: " + e.getMessage());
+            highestRatedUrls.add("Произошла ошибка. Повторите попытку позже");
+        }
+        DBConnect.disconnect();
+        if (highestRatedUrls.isEmpty())
+        {
+            highestRatedUrls.add("Пока что никто ничего не оценил");
+        }
+        return highestRatedUrls;
     }
 }
